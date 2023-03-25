@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: local.Dockerfile
+    command: >
+      sh -c "pip3 install -r requirements/base.txt &&
+      uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+    ports:
+      - 8000:8000
+    environment:
+      - MONGO_URI=mongodb://bunotan_mongo_user:bunotan_mongo_password@db-name:27017
+      - DB_NAME=bunotan_db
+      - APP_KEY=bunotan_app_key
+    volumes:
+      - .:/app
+
+  db-name:
+    image: mongo
+    restart: always
+    volumes:
+      - bunotan-db-volume:/data/db
+    command: mongod --quiet --logpath /dev/null
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bunotan_mongo_user
+      MONGO_INITDB_ROOT_PASSWORD: bunotan_mongo_password
+
+volumes:
+  bunotan-db-volume:
